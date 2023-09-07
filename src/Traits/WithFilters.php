@@ -188,8 +188,13 @@ trait WithFilters
                 // did not do "month shifting"
                 // (e.g. consider that January 32 is February 1)
                 $dt = DateTime::createFromFormat("Y-m-d", $filterValue);
-
-                return $dt !== false && ! array_sum($dt::getLastErrors());
+                if ($dt === false){
+                    return true;
+                }
+                if ($dt::getLastErrors() === false){
+                    return true;
+                }
+                return false;
             }
 
             if ($filterDefinitions[$filterName]->isDatetime()) {
@@ -198,7 +203,13 @@ trait WithFilters
                 // (e.g. consider that January 32 is February 1)
                 $dt = DateTime::createFromFormat("Y-m-d\TH:i", $filterValue);
 
-                return $dt !== false && ! array_sum($dt::getLastErrors());
+                if ($dt === false){
+                    return true;
+                }
+                if ($dt::getLastErrors() === false){
+                    return true;
+                }
+                return false;
             }
 
             return false;
