@@ -68,22 +68,23 @@ class ColumnUtilities
     public static function hasWildcardMatch($column, $searchColumns): bool
     {
         return count(array_filter($searchColumns ?? [], function ($searchColumn) use ($column) {
-            // Match wildcards such as * or table.*
-            $hasWildcard = Str::endsWith($searchColumn, '*');
-
-            // If no wildcard, skip
-            if (! $hasWildcard) {
-                return false;
+            // Check if $searchColumn is a string before using Str::endsWith
+            if (is_string($searchColumn)) {
+                // Match wildcards such as * or table.*
+                $hasWildcard = Str::endsWith($searchColumn, '*');
+                // If no wildcard, skip
+                if (!$hasWildcard) {
+                    return false;
+                }
+                if (!self::hasRelation($column)) {
+                    return true;
+                }
+                $selectColumnPrefix = self::parseRelation($searchColumn);
+                $columnPrefix = self::parseRelation($column);
+                return $selectColumnPrefix === $columnPrefix;
             }
-
-            if (! self::hasRelation($column)) {
-                return true;
-            }
-
-            $selectColumnPrefix = self::parseRelation($searchColumn);
-            $columnPrefix = self::parseRelation($column);
-
-            return $selectColumnPrefix === $columnPrefix;
+            // Return false for non-string values
+            return false;
         })) > 0;
     }
 
